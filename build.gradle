@@ -1,0 +1,82 @@
+buildscript {
+	repositories {
+	    mavenCentral()
+		jcenter()
+	        maven {
+        		url "http://build.staging.obanyc.com/archiva/repository/snapshots/"
+    		}
+    		
+	}
+	dependencies {
+		classpath "io.spring.gradle:dependency-management-plugin:0.6.1.RELEASE"
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:1.4.3.RELEASE"
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'war'
+
+jar {
+    from({configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }}) {
+        // remove all signature files
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    manifest {
+        attributes 'Implementation-Title': 'NJB-RT-PROXY',
+                   'Implementation-Version': '0.1',
+                   'Main-Class': 'net.mtabuscis.njbrt.impl.Application'
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven {
+        url "http://download.osgeo.org/webdav/geotools/"
+    }
+    maven {
+        url "http://nexus.onebusaway.org/content/groups/public/"
+    }
+    mavenCentral()
+}
+
+configurations {
+	providedRuntime
+}
+
+ext.log4jVersion = '1.7.5'
+
+dependencies {
+	compile group: 'javax.media', name: 'jai_core', version: '1.1.3'
+	compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.5'
+	compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.5'
+	compile group: 'org.onebusaway', name: 'onebusaway-gtfs', version: '1.3.4'
+	compile group: 'org.onebusaway', name: 'onebusaway-transit-data-federation', version: '1.1.16'
+	compile group: 'org.onebusaway', name: 'onebusaway-geospatial', version: '1.1.6'
+	compile group: 'org.onebusaway', name: 'onebusaway-gtfs-realtime-exporter', version: '1.2.0'
+	compile group: 'org.onebusaway', name: 'onebusaway-transit-data-federation-builder', version: '1.1.15'
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.8'
+	compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.8.8'
+	compile 'me.xdrop:fuzzywuzzy:1.1.7'
+	compile 'org.springframework:spring-webmvc:3.0.5.RELEASE'
+	compile 'javax.servlet:jstl:1.2'
+}
+
+
+eclipse {
+	classpath {
+		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.9'
+}

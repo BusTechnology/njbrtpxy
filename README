@@ -1,0 +1,16 @@
+This is the MTA's attempt at cleaning up the New Jersey Transit Bus Data, you'll need to reach out to them for exact endpoints.  The output is GTFS-RT Vehicle Position and Trip Update feeds
+
+This software is built on top of OneBusAway, an open source platform for AVL and it is the same platform that powers the MTA Bus Time application.
+
+First, you'll need to create an OBA bundle, download the NJT Bus GTFS Data and run the following command.  Note that we modify the parameters, the GTFS that NJB creates isn't perfect and OBA has difficulties making sense of some of it.
+java -jar tools/obabuilder-1-1-16.jar -P tripEntriesFactory.throwExceptionOnInvalidStopToShapeMappingException=false -P distanceAlongShapeLibrary.localMinimumThreshold=50 -P distanceAlongShapeLibrary.maxDistanceFromStopToShapePoint=1000 gtfs_file.zip /tmp/njb_bundle
+
+Next, you'll want to build the jar file and the docker image, these are done as follows
+gradle clean
+gradle build
+make docker
+
+add the right data to default.env
+
+Finally, you can run the service with
+docker run --env-file=default.env aaa/njbrtpxy 
